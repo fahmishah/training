@@ -1,5 +1,7 @@
 {
   "name": "hellogold",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "ionic-angular"
 }

@@ -30,6 +30,7 @@
     </ion-list>
 
       <ion-grid>
+        <span class="{{ priceInd }}">
           <ion-row align-items-center>
             <ion-col>
               Buy
@@ -40,14 +41,17 @@
               <h4>RM {{ spotOnData.sell }}</h4>
             </ion-col>
           </ion-row>
+        </span>
         </ion-grid>
 
         <ion-list>
           <ion-list-header>History Price</ion-list-header>
-        <ion-item *ngFor="let list of spotOnList" >
-          <small>Buy:</small> RM {{ list.buy }} 	&nbsp; | &nbsp;    
-          <small>Sell:</small> RM {{ list.sell }} 
-        </ion-item>
+            <ion-item *ngFor="let list of spotOnList.slice().reverse() let i = index;">
+              <!-- <span class="{{ priceInd }}"> -->
+                <small>Buy:</small> RM {{ list.buy }} 	&nbsp; | &nbsp;    
+                <small>Sell:</small> RM {{ list.sell }} 
+              <!-- </span> -->
+            </ion-item>
       </ion-list>
 
 </ion-content>

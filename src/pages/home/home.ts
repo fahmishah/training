@@ -15,11 +15,12 @@ export class HomePage {
   public spotOnData = <any> {};
   public spotOnList = <any>[];
   public userEmail = '';
+  public priceInd = '';
 
   constructor(public navCtrl: NavController, public loadingCtrl: LoadingController, 
     private storage: Storage, public http: Http, public user: UserProvider) {
 
-      this.userEmail = this.user.getEmail();
+      this.userEmail = window.localStorage.getItem('email');
 
 }
 
@@ -44,7 +45,20 @@ getPrice(event) {
 
     console.log(data);
 
+    if (this.spotOnList === undefined || this.spotOnList.length == 0) {
+      this.priceInd = 'price';
+    } else {
+      if (data.data.buy >  this.spotOnList[this.spotOnList.length - 1].buy) {
+        this.priceInd = 'price-up'
+      } else if (data.data.buy <  this.spotOnList[this.spotOnList.length - 1].buy) {
+        this.priceInd = 'price-down'
+      } else {
+        this.priceInd = 'price';
+      }
+    }
+
     this.spotOnData = data.data;
+    this.spotOnData["indicator"] = this.priceInd;
     this.spotOnList.push(this.spotOnData);
 
     console.log(this.spotOnList);

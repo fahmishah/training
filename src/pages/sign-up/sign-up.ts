@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, AlertController, LoadingController } from 'ionic-angular';
+import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { Http, URLSearchParams} from '@angular/http';
-import { CacheService } from 'ionic-cache';
 import { UserProvider } from '../../providers/user/user';
 
 @IonicPage()
@@ -11,18 +11,24 @@ import { UserProvider } from '../../providers/user/user';
 })
 export class SignUpPage {
 
-  public registerData = <any> {};
+  public authForm: FormGroup;
+
   public logStatus = "logStatus";
   public userEmail = "userEmail";
   public userData = "userData";
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public alertCtrl: AlertController, 
-    public loadingCtrl: LoadingController, public http: Http, public cache: CacheService, public user: UserProvider) {
+    public loadingCtrl: LoadingController,  public formBuilder: FormBuilder, public http: Http, public user: UserProvider) {
 
-    this.registerData.tnc = false;
+    this.authForm = formBuilder.group({
+      email: ['', Validators.compose([Validators.maxLength(70), Validators.pattern('^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$'), Validators.required])],
+      tnc: [false]
+  });
+
   }
 
-  register() {
+  onSubmit(value: any): void {
+
 
     let loading = this.loadingCtrl.create({
       content: 'Please wait...'
@@ -38,12 +44,12 @@ export class SignUpPage {
 
     // set param
     let urlSearchParams = new URLSearchParams();
-    urlSearchParams.append('email', this.registerData.email);
+    urlSearchParams.append('email', value.email);
     urlSearchParams.append('uuid', this.generateUUID());
     urlSearchParams.append('data', this.generateString());
-    urlSearchParams.append('tnc', this.registerData.tnc);
+    urlSearchParams.append('tnc', value.tnc);
 
-    // console.log(urlSearchParams.toString());
+    console.log(urlSearchParams.toString());
 
     this.http.post("https://staging.hellogold.com/api/v3/users/register.json?" + urlSearchParams.toString(), null)
     .subscribe(data => {
@@ -52,14 +58,10 @@ export class SignUpPage {
       console.log(response);
       loading.dismiss();
 
-      //set user email and result data from API to provider
-      this.user.setEmail(this.registerData.email);
-      this.user.setData(response.data);
+      //set user email and result data from API to storage
+      window.localStorage.setItem('email', value.email);
+      window.localStorage.setItem('userData', response.data);
 
-      // set cache
-      this.cache.saveItem(this.logStatus, true);
-      this.cache.saveItem(this.userEmail, this.registerData.email);
-      this.cache.saveItem(this.userData, response.data);
       this.navCtrl.setRoot('HomePage');
 
      }, error => {

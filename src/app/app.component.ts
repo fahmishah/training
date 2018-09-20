@@ -2,8 +2,8 @@ import { Component, ViewChild } from '@angular/core';
 import { Nav, Platform, LoadingController } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
-import { CacheService } from "ionic-cache";
 import { UserProvider } from '../providers/user/user';
+
 
 
 @Component({
@@ -19,7 +19,7 @@ export class MyApp {
 
 
   constructor(public platform: Platform, public statusBar: StatusBar, public splashScreen: SplashScreen, 
-    public loadingCtrl: LoadingController, private cache: CacheService, public user: UserProvider) {
+    public loadingCtrl: LoadingController, public user: UserProvider) {
 
     this.initializeApp();
 
@@ -28,8 +28,14 @@ export class MyApp {
       { title: 'Home', component: 'HomePage' }
     ];
 
-    cache.setDefaultTTL(60 * 60); //set default cache TTL for 1 hour
+  }
 
+  checkPreviousAuthorization(): void { 
+    if((window.localStorage.getItem('email') === "undefined" || window.localStorage.getItem('email') === null)) {
+      this.rootPage = 'SignUpPage';
+    } else {
+      this.rootPage = 'HomePage';
+    }
   }
 
   initializeApp() {
@@ -38,6 +44,7 @@ export class MyApp {
       // Here you can do any higher level native things you might need.
       this.statusBar.styleDefault();
       this.splashScreen.hide();
+      this.checkPreviousAuthorization();
     });
 
   }
